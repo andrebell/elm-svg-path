@@ -28,7 +28,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/svg-playground/favicon.ico"
   },
   {
-    "revision": "46c305add23a67212ef5d89e5547274e",
+    "revision": "3f4b9f73e44ca8443e2a1aad5c22d90d",
     "url": "/svg-playground/index.html"
   },
   {
@@ -64,12 +64,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/svg-playground/safari-pinned-tab.svg"
   },
   {
-    "revision": "11407b208d54fff34870",
+    "revision": "4b27c4be1a443236867e",
     "url": "/svg-playground/static/css/main.7f457dfb.chunk.css"
   },
   {
-    "revision": "11407b208d54fff34870",
-    "url": "/svg-playground/static/js/main.11407b20.chunk.js"
+    "revision": "4b27c4be1a443236867e",
+    "url": "/svg-playground/static/js/main.4b27c4be.chunk.js"
   },
   {
     "revision": "41c8cd38b072a0e07c94",
