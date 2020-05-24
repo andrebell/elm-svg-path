@@ -9,6 +9,7 @@ import Element.Font as Font
 import Html as H exposing (Html)
 import Html.Attributes as HA
 import List
+import Logo exposing (logo)
 import Svg as S
 import Svg.Attributes as SA
 import Time
@@ -316,12 +317,14 @@ viewDesktopTitleBar model =
         , spacing 10
         , padding 10
         ]
-        [ image
-            [ Background.color uiColor.white
-            , Border.rounded 5
-            , height (px 30)
-            ]
-            { src = "/logo.svg", description = "Logo" }
+        [ el [] (html <| logo)
+
+        --image
+        --    [ Background.color uiColor.white
+        --    , Border.rounded 5
+        --    , height (px 30)
+        --    ]
+        --    { src = "/svg-playground/logo.svg", description = "Logo" }
         , text "Playground"
         ]
 
