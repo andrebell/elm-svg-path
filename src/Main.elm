@@ -25,6 +25,7 @@ import Element.Border as Border
 import Element.Font as Font
 import Html as H exposing (Html)
 import Html.Attributes as HA
+import Html.Events.Extra.Pointer as Pointer
 import List
 import Logo exposing (logo)
 import Svg as S
@@ -73,9 +74,15 @@ updateAnimationFrameMeta time afmeta_ =
                 }
 
 
+type Operation
+    = Waiting
+    | MovingSplitter Pointer.Event
+
+
 type alias Model =
     { windowsettings : WindowSettings
     , afmeta : Maybe AnimationFrameMeta
+    , operation : Operation
     }
 
 
@@ -109,8 +116,14 @@ init flags =
         resultHeight =
             flags.height - 79
     in
-    ( { windowsettings = WindowSettings flags split resultWidth resultHeight
+    ( { windowsettings =
+            WindowSettings
+                flags
+                split
+                resultWidth
+                resultHeight
       , afmeta = Nothing
+      , operation = Waiting
       }
     , Cmd.none
     )
@@ -123,6 +136,12 @@ init flags =
 type Msg
     = BrowserResize ( Int, Int )
     | AnimationFrame Time.Posix
+    | SplitterDown Pointer.Event
+
+
+
+--| SplitterMove ( Float, Float )
+--| SplitterUp ( Float, Float )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -148,6 +167,13 @@ update msg model =
         AnimationFrame time ->
             ( { model
                 | afmeta = updateAnimationFrameMeta time model.afmeta
+              }
+            , Cmd.none
+            )
+
+        SplitterDown event ->
+            ( { model
+                | operation = MovingSplitter event
               }
             , Cmd.none
             )
@@ -353,7 +379,17 @@ viewDesktopPlayground model =
         , width fill
         ]
         [ viewResult model
-        , viewVDivider 10
+
+        --, viewVDivider 10
+        , el
+            [ Background.color uiColor.midgrey
+            , height fill
+            , width (px 10)
+            , padding 0
+            , spacing 0
+            , htmlAttribute <| Pointer.onDown SplitterDown
+            ]
+            none
         , el
             [ Background.color uiColor.darkgrey
             , height fill
@@ -375,16 +411,20 @@ viewDesktopStatusBar model =
         , alignLeft
         , width fill
         ]
-        [ --el
-          --    [ padding 5
-          --    ]
-          --    (text <| Debug.toString <| classifyDevice model.windowsettings.size)
-          --, el
-          --    [ padding 5
-          --    ]
-          --    (text <| Debug.toString model.windowsettings.size)
-          viewAnimationFrameMetaDT model.afmeta
+        [ viewAnimationFrameMetaDT model.afmeta
         , viewAnimationFrameMetaFPS model.afmeta
+
+        -- DEBUG output
+        , el
+            [ padding 5
+            ]
+            (text <| Debug.toString <| classifyDevice model.windowsettings.size)
+        , el
+            [ padding 5
+            ]
+            (text <| Debug.toString model.operation)
+
+        -- COPYRIGHT
         , el
             [ Border.widthEach { top = 0, left = 0, bottom = 0, right = 0 }
             , Border.color uiColor.midgrey
