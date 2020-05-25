@@ -12,7 +12,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/svg-playground/apple-touch-icon.png"
   },
   {
-    "revision": "dc2aa19ede8eec64104a3b87844a9343",
+    "revision": "f177bcb4218772d6cc10eda0f0b48dc0",
     "url": "/svg-playground/browserconfig.xml"
   },
   {
@@ -28,15 +28,15 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/svg-playground/favicon.ico"
   },
   {
-    "revision": "3f4b9f73e44ca8443e2a1aad5c22d90d",
+    "revision": "1295ca51610d0290bc0ed9ce586dcdbf",
     "url": "/svg-playground/index.html"
   },
   {
-    "revision": "7d6aafee8e6865b0c58c5338b1a52038",
+    "revision": "a9891b05eefee6a2f9f863212305a605",
     "url": "/svg-playground/logo.svg"
   },
   {
-    "revision": "01737ecaff535e8a0fb3e2148705582e",
+    "revision": "20871df64bc54b9e6b7bec9d31081eb3",
     "url": "/svg-playground/manifest.json"
   },
   {
@@ -60,16 +60,16 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/svg-playground/mstile-70x70.png"
   },
   {
-    "revision": "797e9574fe7a0a4f69608ea3cb717d0e",
+    "revision": "3ee1b429fda639e54ae63a4c6b71ede8",
     "url": "/svg-playground/safari-pinned-tab.svg"
   },
   {
-    "revision": "4b27c4be1a443236867e",
-    "url": "/svg-playground/static/css/main.7f457dfb.chunk.css"
+    "revision": "4f4a486f82cc0535f849",
+    "url": "/svg-playground/static/css/main.024c7bf5.chunk.css"
   },
   {
-    "revision": "4b27c4be1a443236867e",
-    "url": "/svg-playground/static/js/main.4b27c4be.chunk.js"
+    "revision": "4f4a486f82cc0535f849",
+    "url": "/svg-playground/static/js/main.4f4a486f.chunk.js"
   },
   {
     "revision": "41c8cd38b072a0e07c94",
