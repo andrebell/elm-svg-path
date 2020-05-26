@@ -23,8 +23,10 @@ import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
+import Element.Input as Input
 import Html as H exposing (Html)
 import Html.Attributes as HA
+import Html.Events.Extra.Mouse as Mouse
 import Html.Events.Extra.Pointer as Pointer
 import Html.Events.Extra.Touch as Touch
 import List
@@ -77,7 +79,7 @@ updateAnimationFrameMeta time afmeta_ =
 
 type Operation
     = Waiting
-    | MovingSplitter Pointer.Event
+    | MovingSplitter (Maybe ( Float, Float )) (Maybe ( Float, Float ))
     | TouchingSplitter (Maybe ( Float, Float )) (Maybe ( Float, Float ))
 
 
@@ -138,9 +140,9 @@ init flags =
 type Msg
     = BrowserResize ( Int, Int )
     | AnimationFrame Time.Posix
-    | SplitterDown Pointer.Event
-    | SplitterMove Pointer.Event
-    | SplitterUp Pointer.Event
+    | SplitterDown Mouse.Event
+    | SplitterMove Mouse.Event
+    | SplitterUp Mouse.Event
     | SplitterTouchStart Touch.Event
     | SplitterTouchMove Touch.Event
     | SplitterTouchEnd Touch.Event
@@ -179,25 +181,82 @@ update msg model =
             )
 
         SplitterDown event ->
+            let
+                startpos =
+                    Just event.clientPos
+            in
             ( { model
-                | operation = MovingSplitter <| Debug.log "event: " event
+                | operation = MovingSplitter startpos Nothing --<| Debug.log "\n Down-event: " event
               }
             , Cmd.none
             )
 
         SplitterMove event ->
-            ( { model
-                | operation = MovingSplitter <| Debug.log "event: " event
-              }
-            , Cmd.none
-            )
+            let
+                movepos =
+                    Just event.clientPos
+            in
+            case model.operation of
+                MovingSplitter start_ move_ ->
+                    let
+                        x =
+                            case movepos of
+                                Just p ->
+                                    Tuple.first p
+
+                                Nothing ->
+                                    0
+
+                        w =
+                            model.windowsettings.size.width
+
+                        h =
+                            model.windowsettings.size.height
+
+                        ws =
+                            model.windowsettings
+
+                        split =
+                            x / toFloat w
+
+                        resultWidth =
+                            round <| (split * toFloat (w - 10))
+
+                        resultHeight =
+                            h - 79
+
+                        newws =
+                            { ws
+                                | split = split
+                                , resultWidth = resultWidth
+                                , resultHeight = resultHeight
+                            }
+                    in
+                    ( { model
+                        | operation = MovingSplitter start_ movepos
+                        , windowsettings = newws
+                      }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    ( model, Cmd.none )
 
         SplitterUp event ->
-            ( { model
-                | operation = MovingSplitter <| Debug.log "event: " event
-              }
-            , Cmd.none
-            )
+            let
+                endpos =
+                    Just event.clientPos
+            in
+            case model.operation of
+                MovingSplitter start_ move_ ->
+                    ( { model
+                        | operation = Waiting
+                      }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    ( model, Cmd.none )
 
         SplitterTouchStart event ->
             let
@@ -492,17 +551,22 @@ viewDesktopPlayground model =
             , width (px 10)
             , padding 0
             , spacing 0
+            , htmlAttribute <| Mouse.onDown SplitterDown
+            , htmlAttribute <| Mouse.onMove SplitterMove
+            , htmlAttribute <| Mouse.onUp SplitterUp
             , htmlAttribute <| Touch.onStart SplitterTouchStart
             , htmlAttribute <| Touch.onMove SplitterTouchMove
             , htmlAttribute <| Touch.onEnd SplitterTouchEnd
             ]
             none
-        , el
+        , paragraph
             [ Background.color uiColor.darkgrey
             , height fill
             , width fill
             ]
-            (text <| Debug.toString model.windowsettings)
+            [ text <| Debug.toString model.windowsettings
+            , text <| Debug.toString model.operation
+            ]
         ]
 
 
