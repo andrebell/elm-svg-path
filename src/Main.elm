@@ -26,6 +26,7 @@ import Element.Font as Font
 import Html as H exposing (Html)
 import Html.Attributes as HA
 import Html.Events.Extra.Pointer as Pointer
+import Html.Events.Extra.Touch as Touch
 import List
 import Logo exposing (logo)
 import Svg as S
@@ -77,6 +78,7 @@ updateAnimationFrameMeta time afmeta_ =
 type Operation
     = Waiting
     | MovingSplitter Pointer.Event
+    | TouchingSplitter (Maybe ( Float, Float )) (Maybe ( Float, Float ))
 
 
 type alias Model =
@@ -137,6 +139,11 @@ type Msg
     = BrowserResize ( Int, Int )
     | AnimationFrame Time.Posix
     | SplitterDown Pointer.Event
+    | SplitterMove Pointer.Event
+    | SplitterUp Pointer.Event
+    | SplitterTouchStart Touch.Event
+    | SplitterTouchMove Touch.Event
+    | SplitterTouchEnd Touch.Event
 
 
 
@@ -173,13 +180,110 @@ update msg model =
 
         SplitterDown event ->
             ( { model
-                | operation = MovingSplitter event
+                | operation = MovingSplitter <| Debug.log "event: " event
               }
             , Cmd.none
             )
 
+        SplitterMove event ->
+            ( { model
+                | operation = MovingSplitter <| Debug.log "event: " event
+              }
+            , Cmd.none
+            )
+
+        SplitterUp event ->
+            ( { model
+                | operation = MovingSplitter <| Debug.log "event: " event
+              }
+            , Cmd.none
+            )
+
+        SplitterTouchStart event ->
+            let
+                startpos =
+                    List.head event.changedTouches |> Maybe.map .clientPos
+            in
+            ( { model
+                | operation = TouchingSplitter startpos Nothing
+              }
+            , Cmd.none
+            )
+
+        SplitterTouchMove event ->
+            let
+                movepos =
+                    List.head event.changedTouches |> Maybe.map .clientPos
+            in
+            case model.operation of
+                TouchingSplitter start_ move_ ->
+                    let
+                        x =
+                            case movepos of
+                                Just p ->
+                                    Tuple.first p
+
+                                Nothing ->
+                                    0
+
+                        w =
+                            model.windowsettings.size.width
+
+                        h =
+                            model.windowsettings.size.height
+
+                        ws =
+                            model.windowsettings
+
+                        split =
+                            x / toFloat w
+
+                        resultWidth =
+                            round <| (split * toFloat (w - 10))
+
+                        resultHeight =
+                            h - 79
+
+                        newws =
+                            { ws
+                                | split = split
+                                , resultWidth = resultWidth
+                                , resultHeight = resultHeight
+                            }
+                    in
+                    ( { model
+                        | operation = TouchingSplitter start_ movepos
+                        , windowsettings = newws
+                      }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        SplitterTouchEnd event ->
+            let
+                endpos =
+                    List.head event.changedTouches |> Maybe.map .clientPos
+            in
+            case model.operation of
+                TouchingSplitter start_ move_ ->
+                    ( { model
+                        | operation = Waiting
+                      }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    ( model, Cmd.none )
 
 
+
+--( { model
+--    | operation = TouchingSplitter <| Debug.log "event: " event
+--  }
+--, Cmd.none
+--)
 ---- UI SCHEME ----
 
 
@@ -219,6 +323,7 @@ view model =
         [ Background.color uiColor.darkgrey
         , Font.color uiColor.white
         , Font.size uiFont.normal
+        , htmlAttribute <| HA.style "touch-action" "none"
         ]
         (viewDesktopLayout model)
 
@@ -387,7 +492,9 @@ viewDesktopPlayground model =
             , width (px 10)
             , padding 0
             , spacing 0
-            , htmlAttribute <| Pointer.onDown SplitterDown
+            , htmlAttribute <| Touch.onStart SplitterTouchStart
+            , htmlAttribute <| Touch.onMove SplitterTouchMove
+            , htmlAttribute <| Touch.onEnd SplitterTouchEnd
             ]
             none
         , el
@@ -395,7 +502,7 @@ viewDesktopPlayground model =
             , height fill
             , width fill
             ]
-            (text "Right")
+            (text <| Debug.toString model.windowsettings)
         ]
 
 
