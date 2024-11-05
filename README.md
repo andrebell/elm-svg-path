@@ -1,5 +1,9 @@
 # Elm App
 
+> [!CAUTION]
+> Since Elm sees no longer active development, I have stopped to use Elm.
+> Hence, I archive this project
+
 This project is bootstrapped with [Create Elm App](https://github.com/halfzebra/create-elm-app).
 
 Below you will find some information on how to perform basic tasks.
